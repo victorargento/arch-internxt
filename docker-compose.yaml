@@ -1,0 +1,172 @@
+---
+version: "3"
+services:
+
+  bridge:
+    image: bridge-image
+    container_name: bridge
+    restart: always
+    ports:
+      - "6382:6382"
+    environment:
+      NODE_ENV: devolpment
+      storjbridge_storage__mongoUrl: mongodb://root:example@mongo/admin
+      storjbridge_storage__mongoOpts__ssl: "false"
+      storjbridge_storage__mongoOpts__useMongoClient: "true"
+      storjbridge_storage__mongoOpts__dbName: __inxt-network
+      storjbridge_storage__mongoOpts__authSource: admin
+      storjbridge_storage__mongoOpts__user: root
+      storjbridge_storage__mongoOpts__pass: example
+      storjbridge_server__host: 127.0.0.1
+      storjbridge_server__port: 6382
+      storjbridge_server__timeout: 240000
+      storjbridge_server__ssl__cert: "null"
+      storjbridge_server__ssl__key: "null"
+      storjbridge_server__ssl__ca: "[]"
+      storjbridge_server__ssl__redirect: 80
+      storjbridge_server__public__host: bridge
+      storjbridge_server__public__port: 6382
+      storjbridge_complex__rpcUrl: http://landlord:8082
+      storjbridge_complex__rpcUser: user-landlord
+      storjbridge_complex__rpcPassword: pass-landlord
+      storjbridge_logger__level: 4
+      storjbridge_mailer__host: 127.0.0.1
+      storjbridge_mailer__port: 465 
+      storjbridge_mailer__secure: "true"
+      storjbridge_mailer__auth__user: username
+      storjbridge_mailer__auth__pass: password
+      storjbridge_mailer__from: activate@internxt.com
+      storjbridge_api_keys__segment: # Your segmen key
+      storjbridge_application__delayedActivation: "true"
+      storjbridge_application__activateSIP6: "true"
+      storjbridge_application__powOpts__retargetPeriod: 10000
+      storjbridge_application__powOpts__retargetCount: 10
+      storjbridge_application__publishBenchThreshold: 2500
+      storjbridge_application__publishTotal: 36
+      storjbridge_application__publishBenchTotal: 9
+      storjbridge_application__shardsPerMinute: 1000
+      storjbridge_application__farmerTimeoutIgnore: 10m
+      storjbridge_application__freeTier__up__hourlyBytes: 3000000000
+      storjbridge_application__freeTier__up__dailyBytes: 10000000000
+      storjbridge_application__freeTier__up__monthlyBytes: 60000000000
+      storjbridge_application__freeTier__down__hourlyBytes: 9000000000
+      storjbridge_application__freeTier__down__dailyBytes: 30000000000
+      storjbridge_application__freeTier__down__monthlyBytes: 180000000000
+      storjbridge_redis__host: redis
+      storjbridge_redis__port: 6379
+      STORJ_BRIDGE: http://bridge:6382
+    depends_on:
+      - redis
+
+  landlord:
+    image: landlord-image
+    container_name: landlord
+    restart: always
+    environment:
+      storjlandlord_opts__logLevel: 4
+      storjlandlord_opts__amqpUrl: "amqp://rabbitmq"
+      storjlandlord_opts__serverPort: 8082
+      storjlandlord_opts__serverOpts__authorization__username: user-landlord
+      storjlandlord_opts__serverOpts__authorization__password: pass-landlord
+      storjlandlord_opts__mongoOpts__mongos__ssl: "false"
+      storjlandlord_opts__mongoOpts__dbName: __inxt-network
+      storjlandlord_opts__mongoOpts__authSource: admin
+      storjlandlord_opts__mongoOpts__user: root
+      storjlandlord_opts__mongoOpts__pass: example
+      storjlandlord_opts__mongoUrl: mongodb://root:example@mongo/admin      
+      STORJ_BRIDGE: http://bridge:6382
+    depends_on:
+      - rabbit
+      - bridge
+    
+  renter:
+    image: renter-image
+    container_name: renter
+    restart: always
+    environment:
+      network_private_extended_key_string: xprv9xJ62Jwpr14Bbz63pamJV4Z3qT67JfqddRW55LR2bUQ38jty7G2TSVkE5Ro8yYZjrJGVhN8Z3qvmM9XWgGvyceNMUj7xozR4LZS1eEFP5W3
+      storjrenter_opts__mongoUrl: mongodb://root:example@mongo/admin
+      storjrenter_opts__mongoOpts__user: root
+      storjrenter_opts__mongoOpts__pass: example
+      storjrenter_opts__mongoOpts__dbName: __inxt-network
+      storjrenter_opts__mongoOpts__authSource: admin
+      storjrenter_opts__mongoOpts__mongos__ssl: "false"
+      storjrenter_opts__logLevel: 4
+      storjrenter_opts__amqpUrl: "amqp://rabbitmq"
+      storjrenter_opts__networkOpts__rpcPort: 4001
+      storjrenter_opts__networkOpts__rpcAddress: renter
+      storjrenter_opts__networkOpts__doNotTraverseNat: "true"
+      storjrenter_opts__networkOpts__tunnelServerPort: 5000
+      storjrenter_opts__networkOpts__tunnelGatewayRange__min: 6045
+      storjrenter_opts__networkOpts__tunnelGatewayRange__max: 6049
+      storjrenter_opts__networkOpts__maxTunnels: 0
+      storjrenter_opts__networkOpts__bridgeUri: http://bridge:6382
+      storjrenter_opts__networkOpts__maxConnection: 250
+      storjrenter_opts__totalRenters: 1
+      storjrenter_opts__renterOverlap: 1
+      storjrenter_opts__networkIndex: 1
+      STORJ_BRIDGE: http://bridge:6382
+    depends_on:
+      - rabbitmq
+      - landlord
+      - bridge
+      - xcore
+      - xcore2
+
+  xcore:
+    image: xcore-image
+    container_name: xcore
+    restart: always
+    environment:
+      CONTEXT: DEV
+      BRIDGE_URL: http://bridge:6382
+      EXTENDED_KEY: xpub6BHSRpUigNcUpUAWvcJJrCVnPUvbi8ZUzeRfsipe9ow21YE7eoLhzJ4hvkQmEoGMeX3jpwaHp91ycGo1Z4WStsEVBmw1qq6Q3ouPm6GqA4L
+      TOKEN: "0x0000000000000000000000000000000000000001"
+      SIZE: 500GB
+      PORT: 12345
+      EXTERNAL_IP: xcore      
+    depends_on:
+      - bridge
+      - landlord
+
+  xcore2:
+    image: xcore-image
+    container_name: xcore2
+    restart: always
+    environment:
+      CONTEXT: DEV
+      BRIDGE_URL: http://bridge:6382
+      EXTENDED_KEY: xpub6BHSRpUigNcUpUAWvcJJrCVnPUvbi8ZUzeRfsipe9ow21YE7eoLhzJ4hvkQmEoGMeX3jpwaHp91ycGo1Z4WStsEVBmw1qq6Q3ouPm6GqA4L
+      TOKEN: "0x0000000000000000000000000000000000000002"
+      SIZE: 500GB
+      PORT: 12345
+      EXTERNAL_IP: xcore2
+    depends_on:
+      - bridge
+      - landlord
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    container_name: mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+
+  rabbitmq:
+    image: rabbitmq:alpine
+    container_name: rabbitmq
+    restart: always
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+
+  node-lib:
+    image: victorargento/imagen-node-lib:1
+    container_name: node-lib
+    restart: always
+    command: sleep 100000000

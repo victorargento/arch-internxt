@@ -1,0 +1,78 @@
+{
+  "storage": {
+    "mongoUrl": "{{ storage__mongoUrl }}",
+    "mongoOpts": {
+      "ssl": {{ storage__mongoOpts__ssl }},
+      "useMongoClient": {{ storage__mongoOpts__ssl }},
+      "dbName": "{{ storage__mongoOpts__dbName }}",
+      "authSource": "{{ storage__mongoOpts__authSource }}",
+      "user": "{{ storage__mongoOpts__user }}",
+      "pass": "{{ storage__mongoOpts__pass }}"
+    }
+  },
+  "server": {
+    "host": "{{ server__host }}",
+    "port": {{ server__port }},
+    "timeout": {{ server__timeout }},
+    "ssl": {
+      "cert": {{ server__ssl__cert }},
+      "key": {{ server__ssl__key }},
+      "ca": {{ server__ssl__ca }},
+      "redirect": {{ server__ssl__redirect }}
+    },
+    "public": {
+      "host": "{{ server__public__host }}",
+      "port": {{ server__public__port }}
+    }
+  },
+  "complex": {
+    "rpcUrl": "{{ complex__rpcUrl }}",
+    "rpcUser": "{{ complex__rpcUser }}",
+    "rpcPassword": "{{ complex__rpcPassword }}"
+  },
+  "logger": {
+    "level": {{ logger__level }}
+  },
+  "mailer": {
+    "host": "{{ mailer__host }}",
+    "port": {{ mailer__port }},
+    "secure": {{ mailer__secure }},
+    "auth": {
+      "user": "{{ mailer__auth__user }}",
+      "pass": "{{ mailer__auth__pass }}"
+    },
+    "from": "{{ mailer__from }}"
+  },
+  "api_keys": {
+    "segment": "{{ api_keys__segment }}"
+  },
+  "application": {
+    "delayedActivation": {{ application__delayedActivation }},
+    "activateSIP6": {{ application__activateSIP6 }},
+    "powOpts": {
+      "retargetPeriod": {{ application__powOpts__retargetPeriod }},
+      "retargetCount": {{ application__powOpts__retargetCount }}
+    },
+    "publishBenchThreshold": {{ application__publishBenchThreshold }},
+    "publishTotal": {{ application__publishTotal }},
+    "publishBenchTotal": {{ application__publishBenchTotal }},
+    "shardsPerMinute": {{ application__shardsPerMinute }},
+    "farmerTimeoutIgnore": "{{ application__farmerTimeoutIgnore }}",
+    "freeTier": {
+      "up": {
+        "hourlyBytes": {{ application__freeTier__up__hourlyBytes }},
+        "dailyBytes": {{ application__freeTier__up__dailyBytes }},
+        "monthlyBytes": {{ application__freeTier__up__monthlyBytes }}
+      },
+      "down": {
+        "hourlyBytes": {{ application__freeTier__down__hourlyBytes }},
+        "dailyBytes": {{ application__freeTier__down__dailyBytes }},
+        "monthlyBytes": {{ application__freeTier__down__monthlyBytes }}
+      }
+    }
+  },
+  "redis": {
+    "host": "{{ redis__host }}",
+    "port": {{ redis__port }}
+  }
+}
