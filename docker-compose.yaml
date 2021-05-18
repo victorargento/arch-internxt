@@ -170,3 +170,43 @@ services:
     container_name: node-lib
     restart: always
     command: sleep 100000000
+
+  mariadb:
+    image: mariadb:latest
+    container_name: mariadb
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: test
+      MYSQL_ROOT_PASSWORD: pass-mariadb
+  
+  drive-server:
+    image: drive-server-image
+    container_name: drive-server
+    command: sleep 
+    restart: always
+    environment:
+      NODE_ENV: staging
+      RDS_HOSTNAME: mariadb
+      RDS_DBNAME: test
+      RDS_USERNAME: root
+      RDS_PASSWORD: pass-mariadb
+      STORJ_BRIDGE_HTTPS: http://bridge:6382
+      STORJ_BRIDGE: http://bridge:6382
+
+  drive-web:
+    image: drive-web-image
+    container_name: drive-web
+    command: sleep 100000000
+    restart: always
+    environment:
+      REACT_APP_STORJ_BRIDGE: bridge:6382
+      REACT_APP_PROXY_URL: bridge:6382
+      REACT_APP_API_URL: drive-server:8000
+
+  website:
+    image: website-image
+    container_name: website
+    command: sleep 100000000
+    restart: always
