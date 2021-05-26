@@ -23,3 +23,5 @@ FROM node:10.24.1-alpine
 WORKDIR /website
 
 COPY --from=BUILD_IMAGE /website .
+
+CMD [ "yarn run start" ]

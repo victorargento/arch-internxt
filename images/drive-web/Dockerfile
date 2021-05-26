@@ -15,3 +15,5 @@ FROM node:10.24.1-alpine
 WORKDIR /drive-web
 
 COPY --from=BUILD_IMAGE /drive-web .
+
+CMD [ "yarn run start" ]

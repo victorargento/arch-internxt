@@ -184,8 +184,10 @@ services:
     drive-server:
       image: drive-server-image
       container_name: drive-server
-      command: sleep 
+      command: sleep 100000000
       restart: always
+      ports:
+        - "8000:8000"
       environment:
         NODE_ENV: staging
         RDS_HOSTNAME: mariadb
@@ -198,8 +200,10 @@ services:
     drive-web:
       image: drive-web-image
       container_name: drive-web
-      command: sleep 100000000
+      command: yarn run start 
       restart: always
+      ports:
+        - "3020:3000"
       environment:
         REACT_APP_STORJ_BRIDGE: bridge:6382
         REACT_APP_PROXY_URL: bridge:6382
@@ -208,5 +212,7 @@ services:
     website:
       image: website-image
       container_name: website
-      command: sleep 100000000
+      command: yarn run start
       restart: always
+      ports:
+        - "3010:3000"
