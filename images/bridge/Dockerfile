@@ -1,8 +1,6 @@
-FROM node:10.24.1-alpine AS BUILD_PREIMAGE
+FROM node:10.24.1-alpine
 
 RUN apk update && apk add --no-cache g++ make git python
-
-FROM BUILD_PREIMAGE AS BUILD_IMAGE
 
 WORKDIR /bridge
 
@@ -10,13 +8,7 @@ COPY /bridge .
 
 RUN yarn --ignore-engines
 
-FROM node:10.24.1-alpine
-
 ENV NODE_ENV=production
-
-WORKDIR /bridge
-
-COPY --from=BUILD_IMAGE /bridge .
 
 RUN rm -r ./dockerfiles/*
 
